@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        #timer {
+            font-weight: bold;
+            font-size: 15em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="scrollProgress" class="fixed inset-x-0 top-0 z-50">
+        <div id="scrollProgressBar" class="h-4 bg-blue-500" style="width: 0"></div>
+    </div>
+    <div id="timer"></div>
+</div>
+<!-- Circle -->
+<div
+        x-data="scrollProgress"
+        class="fixed inline-flex items-center justify-center overflow-hidden rounded-full bottom-5 left-5"
+>
+    <!-- Building a Progress Ring: https://css-tricks.com/building-progress-ring-quickly/ -->
+    <svg class="w-20 h-20">
+        <circle
+                class="text-gray-300"
+                stroke-width="5"
+                stroke="currentColor"
+                fill="transparent"
+                r="30"
+                cx="40"
+                cy="40"
+        />
+        <circle
+                id="progress-ring__circle"
+                class="text-blue-600"
+                stroke-width="5"
+                stroke-dasharray="0"
+                stroke-dashoffset="0"
+                stroke-linecap="round"
+                stroke="currentColor"
+                fill="transparent"
+                r="30"
+                cx="40"
+                cy="40"
+        />
+    </svg>
+    <span id="progress-ring__percent" class="absolute text-xl text-blue-700">0%</span>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.2.2/cdn.js" defer></script>
+<script>
+    let departMinutes = prompt('Entrez le décompte :');
+    const FULLTIME = departMinutes * 60;
+    let temps = FULLTIME;
+
+    const timerElement = document.getElementById("timer");
+    const barElement = document.getElementById("scrollProgressBar");
+    const barElementCircle = document.getElementById("progress-ring__circle");
+    const radius = barElementCircle.r.baseVal.value;
+    const circumference = radius * 2 * Math.PI;
+    barElementCircle.style.strokeDasharray = circumference;
+
+    const barElementCircleText = document.getElementById("progress-ring__percent");
+
+    setInterval(() => {
+        let minutes = parseInt(temps / 60, 10)
+        let secondes = parseInt(temps % 60, 10)
+
+        let ProgressBarPercent = (100 - Math.round((temps * 100) / FULLTIME));
+        console.log(ProgressBarPercent);
+        barElement.style.width = ProgressBarPercent + "%";
+
+        let offset = circumference - ProgressBarPercent / 100 * circumference;
+        barElementCircle.style.strokeDashoffset = offset;
+
+        barElementCircleText.textContent = Math.round(ProgressBarPercent) + "%"
+
+        minutes = minutes < 10 ? "0" + minutes : minutes
+        secondes = secondes < 10 ? "0" + secondes : secondes
+
+        timerElement.innerText = `${minutes}:${secondes}`
+        temps = temps <= 0 ? 0 : temps - 1
+    }, 1000)
+
+</script>
+</body>
+</html>
